@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusicAnalytics DSS | Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #050505; color: #e5e7eb; }
+        .glass { background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .tab-active { color: #10b981; border-bottom: 2px solid #10b981; background: rgba(16, 185, 129, 0.05); }
+        .table-row:hover { background: rgba(255, 255, 255, 0.02); }
+        .btn-update { background: linear-gradient(135deg, #10b981 0%, #059669 100%); transition: all 0.3s ease; }
+        .btn-update:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+    <div class="max-w-6xl mx-auto glass rounded-3xl overflow-hidden shadow-2xl">
+        <header class="p-6 border-bottom border-white/5 flex justify-between items-center bg-white/5">
+            <div>
+                <h1 class="text-xl font-bold tracking-tight text-white">MusicAnalytics <span class="text-emerald-500">DSS</span></h1>
+                <p class="text-xs text-gray-500 uppercase tracking-widest mt-1">Система підтримки прийняття рішень v1.0</p>
+            </div>
+            <div class="text-right">
+                <span class="text-xs text-gray-400 block uppercase">Аналітик (ОПР)</span>
+                <span class="text-sm font-semibold text-emerald-400">Limoncello62</span>
+            </div>
+        </header>
+
+        <nav class="flex border-b border-white/5 bg-white/2">
+            <button onclick="showTab('alt')" id="btn-alt" class="tab-btn px-6 py-4 text-sm font-medium transition-all tab-active">Alternative</button>
+            <button onclick="showTab('crit')" id="btn-crit" class="tab-btn px-6 py-4 text-sm font-medium transition-all text-gray-500 hover:text-white">Criterion</button>
+            <button onclick="showTab('vec')" id="btn-vec" class="tab-btn px-6 py-4 text-sm font-medium transition-all text-gray-500 hover:text-white">Vector</button>
+            <button onclick="showTab('lpr')" id="btn-lpr" class="tab-btn px-6 py-4 text-sm font-medium transition-all text-gray-500 hover:text-white">LPR</button>
+            <button onclick="showTab('res')" id="btn-res" class="tab-btn px-6 py-4 text-sm font-medium transition-all text-gray-500 hover:text-white">Result</button>
+        </nav>
+
+        <div class="p-6 min-h-[400px]">
+
+            <div id="tab-alt" class="tab-content">
+                <h3 class="text-lg font-semibold mb-4">Об'єкти вибору (Альтернативи)</h3>
+                <table class="w-full text-sm">
+                    <thead class="text-gray-500 border-b border-white/5">
+                        <tr><th class="pb-3 font-medium">ID</th><th class="pb-3 font-medium text-left">Назва треку</th><th class="pb-3 font-medium text-left">Виконавець</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr class="table-row"><td class="py-3 text-gray-500">67</td><td class="py-3 font-medium">So Perfect (w/ MISS LUXURY)</td><td class="py-3 text-gray-400">6arelyhuman</td></tr>
+                        <tr class="table-row"><td class="py-3 text-gray-500">119</td><td class="py-3 font-medium">what do you want me to do?</td><td class="py-3 text-gray-400">Joey Cash</td></tr>
+                        <tr class="table-row"><td class="py-3 text-gray-500">167</td><td class="py-3 font-medium">Billie Jean</td><td class="py-3 text-gray-400">Michael Jackson</td></tr>
+                        <tr class="table-row"><td class="py-3 text-gray-500">249</td><td class="py-3 font-medium">Bumble Bee</td><td class="py-3 text-gray-400">Bambee</td></tr>
+                        <tr class="table-row"><td class="py-3 text-gray-500">285</td><td class="py-3 font-medium">Courtesy Call</td><td class="py-3 text-gray-400">Thousand Foot Krutch</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="tab-crit" class="tab-content hidden">
+                <h3 class="text-lg font-semibold mb-4">Критерії оцінювання</h3>
+                <table class="w-full text-sm">
+                    <thead class="text-gray-500 border-b border-white/5">
+                        <tr><th class="pb-3 font-medium">ID</th><th class="pb-3 font-medium text-left">Критерій</th><th class="pb-3 font-medium text-left">Тип</th><th class="pb-3 font-medium">Вага</th></tr>
+                    </thead>
+                    <tbody class="divide-y divide-white/5">
+                        <tr class="table-row"><td class="py-3 text-gray-500">K1</td><td class="py-3 font-medium">Популярність (Listeners)</td><td class="py-3 text-emerald-500">Кількісний</td><td class="py-3 text-center">0.25</td></tr>
+                        <tr class="table-row"><td class="py-3 text-gray-500">K2</td><td class="py-3 font-medium">Лояльність (My Plays)</td><td class="py-3 text-emerald-500">Кількісний</td><td class="py-3 text-center">0.25</td></tr>
+                        <tr class="table-row"><td class="py-3 text-gray-500">K3</td><td class="py-3 font-medium">Жанрова відповідність</td><td class="py-3 text-amber-500">Якісний</td><td class="py-3 text-center">0.20</td></tr>
+                        <tr class="table-row"><td class="py-3 text-gray-500">K4</td><td class="py-3 font-medium">Особиста оцінка</td><td class="py-3 text-amber-500">Якісний</td><td class="py-3 text-center">0.20</td></tr>
+                        <tr class="table-row"><td class="py-3 text-gray-500">K5</td><td class="py-3 font-medium">Потенціал</td><td class="py-3 text-amber-500">Якісний</td><td class="py-3 text-center">0.10</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="tab-vec" class="tab-content hidden overflow-x-auto">
+    <h3 class="text-lg font-semibold mb-4">Матриця векторних оцінок</h3>
+    <table class="w-full text-xs">
+        <thead class="text-gray-500 border-b border-white/5">
+            <tr>
+                <th class="pb-3 text-left">Альтернатива</th>
+                <th class="pb-3 text-center">K1 (Поп.)</th>
+                <th class="pb-3 text-center">K2 (Лояльн.)</th>
+                <th class="pb-3 text-center">K3 (Жанр)</th>
+                <th class="pb-3 text-center">K4 (Оцінка)</th>
+                <th class="pb-3 text-center">K5 (Потенц.)</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5">
+            <tr class="table-row">
+                <td class="py-3 font-medium">Billie Jean</td>
+                <td class="py-3 text-center">3,132,642</td>
+                <td class="py-3 text-center">7</td>
+                <td class="py-3 text-center">10</td>
+                <td class="py-3 text-center">9</td>
+                <td class="py-3 text-center">9</td>
+            </tr>
+            <tr class="table-row">
+                <td class="py-3 font-medium">Courtesy Call</td>
+                <td class="py-3 text-center">326,017</td>
+                <td class="py-3 text-center">5</td>
+                <td class="py-3 text-center">8</td>
+                <td class="py-3 text-center">8</td>
+                <td class="py-3 text-center">7</td>
+            </tr>
+            <tr class="table-row">
+                <td class="py-3 font-medium">So Perfect</td>
+                <td class="py-3 text-center">10,404</td>
+                <td class="py-3 text-center">5</td>
+                <td class="py-3 text-center">9</td>
+                <td class="py-3 text-center">7</td>
+                <td class="py-3 text-center">8</td>
+            </tr>
+            <tr class="table-row">
+                <td class="py-3 font-medium">Bumble Bee</td>
+                <td class="py-3 text-center">232,240</td>
+                <td class="py-3 text-center">4</td>
+                <td class="py-3 text-center">7</td>
+                <td class="py-3 text-center">6</td>
+                <td class="py-3 text-center">7</td>
+            </tr>
+            <tr class="table-row">
+                <td class="py-3 font-medium">what do you want me to do?</td>
+                <td class="py-3 text-center">15,809</td>
+                <td class="py-3 text-center">3</td>
+                <td class="py-3 text-center">6</td>
+                <td class="py-3 text-center">7</td>
+                <td class="py-3 text-center">6</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+            <div id="tab-lpr" class="tab-content hidden">
+                <div class="flex items-center gap-6 p-8 bg-white/5 rounded-2xl border border-white/10">
+                    <div class="w-20 h-20 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center text-3xl">🧑‍💻</div>
+                    <div>
+                        <h3 class="text-xl font-bold">Limoncello62</h3>
+                        <p class="text-sm text-gray-400 mt-1 uppercase tracking-widest">Експерт (Rank 1)</p>
+                        <div class="mt-4 grid grid-cols-2 gap-4 text-xs">
+                            <div class="p-2 glass rounded-lg"><span class="text-gray-500 block">ID користувача:</span> x0j2mgbtdxiw5...</div>
+                            <div class="p-2 glass rounded-lg"><span class="text-gray-500 block">Компетентність:</span> 0.98 / 1.0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-res" class="tab-content hidden">
+    <h3 class="text-lg font-semibold mb-4">Фінальний рейтинг (Оптимальні рішення)</h3>
+    <div class="space-y-3">
+        <div class="flex items-center justify-between p-4 glass rounded-xl border-l-4 border-emerald-500 bg-emerald-500/5">
+            <span class="text-xs font-bold bg-emerald-500/20 text-emerald-500 px-2 py-1 rounded w-20 text-center">1 МІСЦЕ</span>
+            <span class="flex-1 px-4 font-semibold text-white">Billie Jean</span>
+            <span class="text-emerald-400 font-mono">Score: 8.75</span>
+        </div>
+
+        <div class="flex items-center justify-between p-4 glass rounded-xl border-l-4 border-emerald-400/50">
+            <span class="text-xs font-bold bg-white/10 text-white px-2 py-1 rounded w-20 text-center">2 МІСЦЕ</span>
+            <span class="flex-1 px-4 font-semibold">Courtesy Call</span>
+            <span class="text-white/60 font-mono">Score: 7.84</span>
+        </div>
+
+        <div class="flex items-center justify-between p-4 glass rounded-xl border-l-4 border-white/20">
+            <span class="text-xs font-bold bg-white/10 text-white px-2 py-1 rounded w-20 text-center">3 МІСЦЕ</span>
+            <span class="flex-1 px-4 font-semibold text-white/80">So Perfect (w/ MISS LUXURY)</span>
+            <span class="text-white/40 font-mono">Score: 7.52</span>
+        </div>
+
+        <div class="flex items-center justify-between p-4 glass rounded-xl border-l-4 border-white/10">
+            <span class="text-xs font-bold bg-white/10 text-white px-2 py-1 rounded w-20 text-center">4 МІСЦЕ</span>
+            <span class="flex-1 px-4 font-semibold text-white/60">Bumble Bee</span>
+            <span class="text-white/30 font-mono">Score: 6.90</span>
+        </div>
+
+        <div class="flex items-center justify-between p-4 glass rounded-xl border-l-4 border-transparent">
+            <span class="text-xs font-bold bg-white/5 text-gray-500 px-2 py-1 rounded w-20 text-center">5 МІСЦЕ</span>
+            <span class="flex-1 px-4 font-semibold text-white/40 text-sm">what do you want me to do?</span>
+            <span class="text-white/20 font-mono text-sm">Score: 6.45</span>
+        </div>
+    </div>
+</div>
+
+        </div>
+
+        <footer class="p-6 bg-white/2 border-t border-white/5 flex justify-center">
+            <button class="btn-update text-white px-10 py-3 rounded-xl font-bold text-sm uppercase tracking-widest">
+                СИНХРОНІЗУВАТИ БД
+            </button>
+        </footer>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('tab-active', 'text-white'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.add('text-gray-500'));
+            document.getElementById('tab-' + tabId).classList.remove('hidden');
+            document.getElementById('btn-' + tabId).classList.add('tab-active', 'text-white');
+        }
+    </script>
+</body>
+</html>
