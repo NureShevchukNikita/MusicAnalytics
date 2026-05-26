@@ -37,10 +37,13 @@
 
         .title-gradient { background: linear-gradient(to right, #fff, var(--spotify-green)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800; }
 
-        .btn-sync { background: var(--spotify-green); color: #000 !important; font-weight: 800; border-radius: 50px; padding: 12px 28px; border: none; box-shadow: 0 4px 20px rgba(29, 185, 84, 0.3); transition: 0.3s; }
-        .btn-sync:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-sync-red { background: var(--lfm-red); color: #fff !important; font-weight: 800; border-radius: 50px; padding: 12px 28px; border: none; box-shadow: 0 4px 20px rgba(255, 77, 77, 0.25); transition: 0.3s; font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-sync-red:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 6px 25px rgba(255, 77, 77, 0.4); }
 
         .badge-count { background: linear-gradient(135deg, #6f42c1, #a274ff); color: white; border-radius: 12px; padding: 6px 14px; font-weight: 700; box-shadow: 0 4px 12px rgba(111,66,193,0.3); }
+
+        .date-filter-input { background: rgba(30, 30, 30, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; border-radius: 50px; padding: 8px 18px; font-size: 0.9rem; }
+        .date-filter-input:focus { background: rgba(45, 45, 45, 0.8); border-color: var(--spotify-green); outline: none; color: #fff; }
 
         #loading-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); display: none; z-index: 9999; flex-direction: column; justify-content: center; align-items: center; backdrop-filter: blur(15px); }
     </style>
@@ -50,54 +53,80 @@
 <div class="blob blob-1"></div><div class="blob blob-2"></div><div class="blob blob-3"></div>
 
 <div id="loading-overlay">
-    <div class="spinner-grow text-success" style="width: 4rem; height: 4rem;"></div>
-    <h4 class="mt-4 fw-bold" style="color: var(--spotify-green);">АНАЛІЗУЄМО ТВОЇ ТРЕКИ...</h4>
+    <div class="spinner-grow text-danger" style="width: 4rem; height: 4rem;"></div>
+    <h4 class="mt-4 fw-bold" style="color: var(--lfm-red); letter-spacing: 1px;">ІМПОРТУЄМО ТА АНАЛІЗУЄМО МАСИВ ДАНИХ (BIG DATA)...</h4>
 </div>
 
 <div class="container py-5">
+
     <div class="d-flex justify-content-between align-items-center mb-5">
         <div>
             <h1 class="display-4 title-gradient">MusicAnalytics System</h1>
-            <p style="color: #b0b0b0;">Профіль: <span class="text-white fw-bold">{{ user.display_name }}</span></p>
+            <p style="color: #b0b0b0;" class="m-0">Профіль: <span class="text-white fw-bold">{{ user.display_name }}</span></p>
         </div>
         <div class="text-end">
-            <button onclick="runAction('/sync')" class="btn-sync">СИНХРОНІЗУВАТИ</button>
-            <br><a href="/" class="text-white-50 small mt-2 d-inline-block" style="text-decoration: none;">← На головну</a>
+<a href="/" class="btn btn-outline-light btn-sm rounded-pill px-3">Вийти</a>
+        </div>
+    </div>
+
+    <div class="card p-4 mb-5" style="background: rgba(15, 15, 15, 0.6); border: 1px solid rgba(255,255,255,0.12);">
+        <div class="row align-items-center g-4">
+
+            <div class="col-xl-7 col-lg-12">
+                <form method="GET" action="/dashboard" class="d-flex align-items-center gap-2 flex-wrap">
+                    <span class="text-white-50 small fw-bold text-uppercase me-2" style="font-size: 0.75rem; letter-spacing: 0.5px;">Аналітичний зріз даних:</span>
+                    <input type="date" id="filter_start" name="start_date" class="date-filter-input" value="{{ start_date }}">
+                    <span class="text-white-50 small">—</span>
+                    <input type="date" id="filter_end" name="end_date" class="date-filter-input" value="{{ end_date }}">
+                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 fw-bold" style="background: var(--spotify-green); border: none; color: #000; padding: 8px 16px;">Застосувати</button>
+                    {% if start_date or end_date %}
+                        <a href="/dashboard" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2">Скинути</a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <div class="col-xl-5 col-lg-12 text-xl-end text-start">
+                {% if not user.lastfm_username %}
+                    <a href="/login/lastfm" class="btn-sync-red d-inline-block text-center" style="text-decoration: none;">
+                        ⚠️ ПІДКЛЮЧИТИ LAST.FM
+                    </a>
+                {% else %}
+                    <button onclick="triggerHistorySync()" class="btn-sync-red">
+                        🚀 ІМПОРТУВАТИ ІСТОРІЮ LAST.FM
+                    </button>
+                {% endif %}
+            </div>
+
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-7">
             <div class="card p-4">
-                <h4 class="mb-4 fw-bold" style="color: #fff;">ХМАРА ЖАНРІВ</h4>
-                <div class="d-flex flex-wrap align-items-center">
+                <h4 class="mb-4 fw-bold" style="color: #fff; letter-spacing: 0.5px;">ХМАРА ЖАНРІВ</h4>
+
+                <div class="d-flex flex-wrap align-items-center mb-2" id="genres-container-box">
                     {% for name, count in genres %}
                     <div class="genre-tag">
                         {{ name.upper() }} <span class="ms-1" style="color: #fff; opacity: 0.6;">{{ count }}</span>
                     </div>
                     {% endfor %}
-                </div>
-            </div>
-
-            <div class="card p-4" style="border-left: 5px solid var(--lfm-red);">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h5 style="color: var(--lfm-red); font-weight: 800;">LAST.FM INTEGRATION</h5>
-                        {% if not user.lastfm_username %}<p class="small mb-0">Підключи Big Data історію</p>
-                        {% else %}<p class="text-white">АКТИВНО: <span class="text-white">{{ user.lastfm_username.upper() }}</span></p>{% endif %}
-                    </div>
-                    {% if user.lastfm_username %}
-                        <button onclick="runAction('/sync/history')" class="btn btn-outline-light rounded-pill px-4 btn-sm fw-bold">ОНОВИТИ</button>
-                    {% else %}
-                        <a href="/login/lastfm" class="btn btn-sm btn-outline-danger rounded-pill px-4 fw-bold">LOG IN</a>
+                    {% if not genres %}
+                        <p class="text-white-50 small m-0 py-3">Немає збережених даних за обраний період дат. Натисніть кнопку імпорту вище.</p>
                     {% endif %}
                 </div>
+
+                {% if genres %}
+                <div class="mt-4 pt-4 border-top border-secondary border-opacity-10" style="height: 250px; position: relative;">
+                    <canvas id="canvasGenresDoughnut"></canvas>
+                </div>
+                {% endif %}
             </div>
         </div>
 
         <div class="col-lg-5">
             <div class="card p-4" style="border-top: 5px solid var(--under-blue);">
-                <h4 class="mb-4 fw-bold" style="color: var(--under-blue);">TOP UNDERGROUND 💎</h4>
+                <h4 class="mb-4 fw-bold" style="color: var(--under-blue); letter-spacing: 0.5px;">TOP UNDERGROUND 💎</h4>
                 {% for title, artist, listeners, plays in underground_tracks %}
                 <div class="d-flex justify-content-between align-items-center mb-4 pb-3" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
                     <div style="max-width: 75%;">
@@ -108,28 +137,90 @@
                     <span class="badge-count">{{ plays }}</span>
                 </div>
                 {% endfor %}
+                {% if not underground_tracks %}
+                    <p class="text-white-50 small m-0">Список порожній.</p>
+                {% endif %}
             </div>
 
             <div class="card p-4">
-                <h5 class="mb-3 fw-bold text-white-50">ГЛОБАЛЬНІ ГІГАНТИ</h5>
+                <h5 class="mb-3 fw-bold text-white-50" style="letter-spacing: 0.5px;">ГЛОБАЛЬНІ ГІГАНТИ</h5>
                 {% for artist, listeners in top_artists %}
-                <div class="d-flex justify-content-between py-2">
+                <div class="d-flex justify-content-between py-2" style="border-bottom: 1px solid rgba(255,255,255,0.02);">
                     <span class="fw-bold" style="color: #f0f0f0;">{{ artist }}</span>
                     <span class="fw-bold" style="color: var(--spotify-green);">{{ "{:,}".format(listeners) }}</span>
                 </div>
                 {% endfor %}
+                {% if not top_artists %}
+                    <p class="text-white-50 small m-0">Список порожній.</p>
+                {% endif %}
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 async function runAction(url) {
     document.getElementById('loading-overlay').style.display = 'flex';
-    const response = await fetch(url);
-    if (response.ok) window.location.reload();
-    else { alert('Помилка сервера'); document.getElementById('loading-overlay').style.display = 'none'; }
+    window.location.href = url;
 }
+
+if (typeof triggerHistorySync !== 'function') {
+    function triggerHistorySync() {
+        const fromDate = document.getElementById('filter_start').value;
+        const toDate = document.getElementById('filter_end').value;
+        let url = '/sync/history';
+
+        if (fromDate || toDate) {
+            url += `?import_from=${fromDate}&import_to=${toDate}`;
+        }
+        runAction(url);
+    }
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    const canvas = document.getElementById('canvasGenresDoughnut');
+    if (!canvas) return;
+
+    const labels = [];
+    const dataValues = [];
+
+    document.querySelectorAll('#genres-container-box .genre-tag').forEach(tag => {
+        const fullText = tag.innerText.trim();
+        const lastSpaceIndex = fullText.lastIndexOf(" ");
+        if (lastSpaceIndex !== -1) {
+            labels.push(fullText.substring(0, lastSpaceIndex).trim());
+            dataValues.push(parseInt(fullText.substring(lastSpaceIndex + 1).trim(), 10));
+        }
+    });
+
+    if (labels.length === 0) return;
+
+    const ctx = canvas.getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: labels.slice(0, 8),
+            datasets: [{
+                data: dataValues.slice(0, 8),
+                backgroundColor: ['#1db954', '#bd10e0', '#00d4ff', '#ff9f43', '#ff4d4d', '#4bc0c0', '#ffcd56', '#9966ff'],
+                borderWidth: 2,
+                borderColor: '#050505'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: { color: '#b3b3b3', font: { size: 11, family: 'Segoe UI' } }
+                }
+            },
+            cutout: '72%'
+        }
+    });
+});
 </script>
 </body>
 </html>

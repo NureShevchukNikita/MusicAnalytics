@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="uk">
 <head>
@@ -7,28 +6,35 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { background-color: #030303; color: #f5f5f5; font-family: 'Inter', 'Segoe UI', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
-
         .glow-sphere { position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(29,185,84,0.1) 0%, transparent 70%); filter: blur(80px); z-index: -1; }
+        .login-card { background: rgba(15, 15, 15, 0.6); border: 1px solid rgba(255,255,255,0.1); padding: 50px; border-radius: 40px; backdrop-filter: blur(30px); text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.5); max-width: 550px; width: 100%; }
 
-        .login-card { background: rgba(15, 15, 15, 0.6); border: 1px solid rgba(255,255,255,0.1); padding: 60px; border-radius: 40px; backdrop-filter: blur(30px); text-align: center; box-shadow: 0 25px 80px rgba(0,0,0,0.5); max-width: 600px; }
-        .btn-main { background: linear-gradient(135deg, #1db954, #191414); color: white !important; font-weight: 700; border-radius: 50px; padding: 18px 45px; font-size: 1.2rem; border: none; transition: 0.4s; box-shadow: 0 10px 30px rgba(29, 185, 84, 0.2); }
-        .btn-main:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(29, 185, 84, 0.4); }
+        .btn-spotify { background: #1db954; color: white !important; font-weight: 700; border-radius: 50px; padding: 15px 35px; font-size: 1.1rem; border: none; transition: 0.3s; text-decoration: none; display: block; margin-bottom: 15px; box-shadow: 0 8px 25px rgba(29, 185, 84, 0.2); }
+        .btn-spotify:hover { background: #1aa34a; transform: translateY(-2px); box-shadow: 0 12px 35px rgba(29, 185, 84, 0.3); }
+
+        .btn-lastfm { background: #ba0000; color: white !important; font-weight: 700; border-radius: 50px; padding: 15px 35px; font-size: 1.1rem; border: none; transition: 0.3s; text-decoration: none; display: block; margin-bottom: 25px; box-shadow: 0 8px 25px rgba(186, 0, 0, 0.2); }
+        .btn-lastfm:hover { background: #a00000; transform: translateY(-2px); box-shadow: 0 12px 35px rgba(186, 0, 0, 0.3); }
+
+        .btn-dash { background: transparent; color: #fff !important; border: 1px solid rgba(255,255,255,0.2); font-weight: 600; border-radius: 50px; padding: 12px 28px; text-decoration: none; display: block; transition: 0.3s; }
+        .btn-dash:hover { background: rgba(255,255,255,0.05); }
         .soft-text { color: #e0e0e0; letter-spacing: 0.02em; }
     </style>
 </head>
 <body>
     <div class="glow-sphere" style="top: -10%; right: -10%;"></div>
     <div class="glow-sphere" style="bottom: -10%; left: -10%; background: radial-gradient(circle, rgba(111,66,193,0.1) 0%, transparent 70%);"></div>
+
     <div class="login-card">
         <h1 class="display-3 fw-bold mb-4">Music<span style="color: #1db954;">Analytics</span></h1>
         <p class="soft-text fs-5 mb-5">Твій персональний гід по музичних даних. Від мейнстріму до андеграунду.</p>
-        {% if not user %}
-            <a href="/login" class="btn-main">ПОЧАТИ РОБОТУ</a>
-        {% else %}
-            <h3 class="mb-4">Привіт, {{ user.display_name }}</h3>
-            <a href="/dashboard" class="btn-main">ВІДКРИТИ ДАШБОРД</a>
-            <div class="mt-4">
-                <a href="/login/lastfm" class="text-white-50 small" style="text-decoration: none;">+ Підключити Last.fm</a>
+
+        <a href="/login" class="btn-spotify">УВІЙТИ ЧЕРЕЗ SPOTIFY</a>
+        <a href="/login/lastfm" class="btn-lastfm">ПІДКЛЮЧИТИ LAST.FM</a>
+
+        {% if user %}
+            <div class="mt-4 pt-3 border-top border-secondary border-opacity-25">
+                <p class="small text-white-50 m-0 mb-2">Активна сесія: <strong>{{ user.display_name }}</strong></p>
+                <a href="/dashboard" class="btn-dash">ПЕРЕЙТИ ДО ДАШБОРДУ →</a>
             </div>
         {% endif %}
     </div>
