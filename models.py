@@ -13,7 +13,6 @@ class User(Base):
     refresh_token = Column(String(500))
     lastfm_username = Column(String(255), nullable=True)
     lastfm_session = Column(String(255), nullable=True)
-    # Зв'язок з треками (один користувач - багато прослуховувань)
     tracks = relationship("UserTrack", back_populates="user")
 
 

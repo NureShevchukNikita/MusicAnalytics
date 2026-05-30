@@ -114,7 +114,6 @@ async def lastfm_callback(token: str, db: Session = Depends(get_db)):
     return RedirectResponse(url="/dashboard")
 
 
-# 🟢 СИНХРОНІЗАЦІЯ SPOTIFY З СИНХРОННИМ MD5-ХЕШУВАННЯМ ТРЕКІВ
 @app.get("/sync")
 async def sync_data(db: Session = Depends(get_db)):
     user = db.query(models.User).first()
@@ -153,21 +152,17 @@ async def sync_data(db: Session = Depends(get_db)):
     return RedirectResponse(url="/dashboard")
 
 
-# 🔴 СИНХРОНІЗАЦІЯ LAST.FM ЗА ОБРАНИМ ЧАСОВИМ ДІАПАЗОНОМ (BIG DATA IMPORT)
-# 🔴 ОНОВЛЕНИЙ ІМПОРТ LAST.FM (БЕЗ ДУБЛІВ, З АВТО-ЛІМІТОМ ДО 200 ТРЕКІВ)
+
 @app.get("/sync/history")
 async def sync_history(import_from: Optional[str] = None, import_to: Optional[str] = None,
                        db: Session = Depends(get_db)):
     user = db.query(models.User).first()
-    # Якщо користувач розлогінився в Last.fm, примусово штовхаємо його на авторизацію
     if not user or not user.lastfm_username:
         return RedirectResponse(url="/login/lastfm")
 
     api_key = os.getenv("LASTFM_API_KEY")
-    # Базовий URL з лімітом 200 треків згідно з ТЗ ККП
     url = f"http://ws.audioscrobbler.com/2.0/?method=user.getrecenttracks&user={user.lastfm_username}&api_key={api_key}&format=json&limit=200"
 
-    # Якщо дати передані — конвертуємо в UNIX Timestamp для API Last.fm
     if import_from and import_from != "":
         ts_from = int(datetime.datetime.strptime(import_from, "%Y-%m-%d").timestamp())
         url += f"&from={ts_from}"
@@ -193,7 +188,6 @@ async def sync_history(import_from: Optional[str] = None, import_to: Optional[st
                 if title_n and artist_n and uts:
                     p_at = datetime.datetime.fromtimestamp(int(uts))
 
-                    # ГЕНЕРАЦІЯ ЄДИНОГО СТАБІЛЬНОГО ID (Запобігає дублюванню на 100%)
                     track_hash = hashlib.md5(
                         f"{title_n.lower().strip()}{artist_n.lower().strip()}".encode('utf-8')).hexdigest()
                     unified_id = f"id_{track_hash}"
@@ -212,7 +206,6 @@ async def sync_history(import_from: Optional[str] = None, import_to: Optional[st
                         db.commit()
                         db.refresh(db_track)
 
-                    # Захист від дублів самого факту прослуховування
                     exists = db.query(models.UserTrack).filter(
                         models.UserTrack.user_id == user.id,
                         models.UserTrack.track_id == db_track.id,
@@ -224,7 +217,7 @@ async def sync_history(import_from: Optional[str] = None, import_to: Optional[st
 
     db.commit()
     return RedirectResponse(url="/dashboard")
-# 📊 ОБРАХУНОК ВСЬОГО ДАШБОРДУ З ГНУЧКИМИ ЧАСОВИМИ ЗРІЗАМИ
+
 @app.get("/dashboard")
 async def dashboard(request: Request, start_date: Optional[str] = None, end_date: Optional[str] = None,
                     db: Session = Depends(get_db)):
